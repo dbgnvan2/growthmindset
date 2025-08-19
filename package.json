@@ -1,0 +1,10 @@
+{
+    "name": "growth-mindset-coach",
+    "version": "1.0.0",
+    "scripts": {
+        "start": "node api/coach.js"
+    },
+    "dependencies": {
+        "cors": "^2.8.5"
+    }
+}

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growth Mindset Coach</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+
+        .conversation-history {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .conversation-entry {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .conversation-entry:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .user-input {
+            font-style: italic;
+            color: #495057;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .coach-response {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .clear-button {
+            background: #6c757d;
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+
+        .clear-button:hover {
+            background: #5a6268;
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        .response-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            border-left: 5px solid #667eea;
+        }
+
+        .response-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .response-section p {
+            color: #555;
+            line-height: 1.7;
+            font-size: 1.1em;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-style: italic;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Growth Mindset Coach</h1>
+            <p>Share what's challenging you, and get personalized AI coaching based on Carol Dweck's growth mindset
+                research</p>
+        </div>
+            <div class="input-section">
+              <label for="nameInput">Your name</label>
+              <input id="nameInput" type="text" placeholder="e.g., Dave" autocomplete="name"
+         style="width:100%;padding:12px;border:2px solid #e1e5e9;border-radius:10px;font-size:16px;" />
+        </div>
+
+        <div id="conversationHistory" class="conversation-history hidden"></div>
+
+        <div class="input-section">
+            <label for="problemInput">What's on your mind right now?</label>
+            <textarea id="problemInput"
+                placeholder="Tell me what's frustrating you, what you're stuck on, or what challenge you're facing..."></textarea>
+        </div>
+
+        <button class="button" onclick="generateResponse()" id="submitButton">Get Coaching Support</button>
+        <button class="button clear-button" onclick="clearHistory()">Start Fresh Conversation</button>
+
+        <div id="responseSection" class="response-section hidden">
+            <h3>Your Coach's Response</h3>
+            <p id="coachResponse"></p>
+        </div>
+
+        <div class="footer">
+            <p>Based on Carol Dweck's research on growth mindset</p>
+        </div>
+    </div>
+// **************************. SCRIPT **************************
+    <script>
+       function withTimeout(promise, ms = 15000) {
+          let t;
+          const timeout = new Promise((_, reject) => {
+             t = setTimeout(() => reject(new Error('Client timeout after ' + ms + 'ms')), ms);
+          });
+          return Promise.race([promise.finally(() => clearTimeout(t)), timeout]);
+        }
+
+        // Helper Functions for following section 
+        function escapeHTML(str) {
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+        }
+
+        function paragraphsToHTML(text) {
+        const parts = String(text).trim().split(/\n\s*\n/); // split on blank lines
+        return parts.map(p => "<p>" + escapeHTML(p.trim()) + "</p>").join("") || "<p></p>";
+        }
+
+       // Store conversation history
+        let conversationHistory = [];
+
+        function updateConversationDisplay() {
+        const historyDiv = document.getElementById("conversationHistory");
+
+        if (!conversationHistory || conversationHistory.length === 0) {
+            historyDiv.classList.add("hidden");
+            return;
+        }
+
+        historyDiv.classList.remove("hidden");
+        historyDiv.innerHTML = "";
+
+        for (let i = 0; i < conversationHistory.length; i++) {
+            const entry = conversationHistory[i];
+            const entryDiv = document.createElement("div");
+            entryDiv.className = "conversation-entry";
+
+            const userHtml  = '<div class="user-input">"' + escapeHTML(entry.input || "") + '"</div>';
+            const coachHtml = '<div class="coach-response">' + paragraphsToHTML(entry.response || "") + "</div>";
+
+            entryDiv.innerHTML = userHtml + coachHtml;
+            historyDiv.appendChild(entryDiv);
+        }
+
+        historyDiv.scrollTop = historyDiv.scrollHeight;
+        }
+
+// *************************
+        async function generateAIResponse(name, userInput, conversationContext) {
+        console.log('[client] POST /api/coach', { hasName: !!name, lenInput: userInput.length, lenCtx: (conversationContext||'').length });
+
+        const res = await withTimeout(fetch('/api/coach', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, userInput, conversationContext })
+        }), 15000);
+
+        console.log('[client] /api/coach status', res.status);
+
+        const text = await res.text();     // read once
+        let data;
+        try { data = JSON.parse(text); } catch {
+            throw new Error('Bad JSON from server: ' + text.slice(0, 300));
+        }
+
+        if (!res.ok) {
+            throw new Error((data && data.error) ? data.error : ('HTTP ' + res.status));
+        }
+
+        if (!data || typeof data.response !== 'string') {
+            throw new Error('Missing "response" field in server JSON');
+        }
+
+        return data.response;
+        }
+
+
+// *************** v1
+//     async function generateAIResponse(name, userInput, conversationContext) {
+//  const response = await fetch('/api/coach', {
+//   method: 'POST',
+//    headers: { 'Content-Type': 'application/json' },
+//    body: JSON.stringify({
+//      name,                 // <-- include the name
+//      userInput,
+//      conversationContext
+//    })
+//  });
+//
+//  if (!response.ok) {
+//    const txt = await response.text().catch(() => '');
+//    throw new Error(`Server Error: ${response.status}${txt ? ' - ' + txt : ''}`);
+// }
+//
+//  const data = await response.json();
+//  return data.response;
+//}
+//*****************************
+        function simulateCoachResponse(userInput, history) {
+            // This simulates what an AI would generate based on the input and history
+            const input = userInput.toLowerCase();
+
+            let response = "";
+
+            // Normalize emotion based on input
+            if (input.includes('frustrated') || input.includes('annoying')) {
+                response += "I totally get that frustration - it's so real when something isn't working the way you want. ";
+            } else if (input.includes('stuck') || input.includes('blocked')) {
+                response += "That stuck feeling is the worst, isn't it? Like hitting an invisible wall. ";
+            } else if (input.includes('behind') || input.includes('slow') || input.includes('late')) {
+                response += "That 'I'm behind' feeling is such a heavy weight to carry - I hear you. ";
+            } else if (input.includes('confused') || input.includes('don\'t understand')) {
+                response += "Confusion is tough, but it's actually your brain working hard to understand something new. ";
+            } else if (input.includes('overwhelmed') || input.includes('too much')) {
+                response += "Whoa, that sounds like a lot hitting you all at once. ";
+            } else {
+                response += "I hear what you're going through, and it sounds really challenging. ";
+            }
+
+            // Action based on input and history
+            if (history.some(h => h.input.toLowerCase().includes('jump'))) {
+                response += "Since you mentioned not liking jumping exercises before, try this instead: take three deep breaths and stretch your arms above your head. ";
+            } else if (input.includes('time') || input.includes('deadline')) {
+                response += "Set a timer for just 15 minutes and work on the smallest piece of this you can think of. ";
+            } else if (input.includes('don\'t know')) {
+                response += "Write down what you DO know about this situation - sometimes seeing what we know helps clarify what we don't. ";
+            } else {
+                response += "Take a 5-minute break and do something completely different, then come back with fresh eyes. ";
+            }
+
+            // Growth mindset reframe
+            if (input.includes('behind') || input.includes('slow')) {
+                response += "Remember: 'I'm not behind - I'm exactly where I need to be in my unique learning journey.'";
+            } else if (input.includes('can\'t') || input.includes('impossible')) {
+                response += "Tell yourself: 'I can't do this easily yet, and that's exactly why it's worth doing.'";
+            } else if (input.includes('frustrated')) {
+                response += "Keep this close: 'This frustration means I care about getting better, and that's the energy I need to push through.'";
+            } else {
+                response += "Hold onto this: 'Every challenge is building skills I don't even know I'll need yet.'";
+            }
+
+            return response;
+        }
+// ********************
+        async function generateResponse() {
+        const name  = document.getElementById('nameInput').value.trim();
+        const input = document.getElementById('problemInput').value.trim();
+
+        if (!name)  { alert('Please enter your name.'); return; }
+        if (!input) { alert('Please share what\'s on your mind first.'); return; }
+
+        // Disable button and show loading
+        const submitButton = document.getElementById('submitButton');
+        const responseDiv  = document.getElementById('responseSection');
+        const responseText = document.getElementById('coachResponse');
+
+        submitButton.disabled = true;
+        submitButton.textContent = 'Generating response...';
+        responseDiv.classList.remove('hidden');
+        responseText.innerHTML = '<span class="loading">Your coach is thinking...</span>'; // <-- show loading text, not `response`
+
+        try {
+            // Build conversation context
+            const context = conversationHistory
+            .map(h => `User: "${h.input}" Coach: "${h.response}"`)
+            .join('\n');
+
+            // Generate AI response (this should return the string body, not the raw fetch Response)
+            const response = await generateAIResponse(name, input, context);
+
+            // Add to conversation history
+            conversationHistory.push({
+            input: input,
+            response: response,
+            timestamp: new Date()
+            });
+
+            // Display response as separate paragraphs (blank-line split + HTML escape)
+            responseText.innerHTML = response
+            .trim()
+            .split(/\n\s*\n/)
+            .map(p => `<p>${p
+                .replace(/&/g,"&amp;")
+                .replace(/</g,"&lt;")
+                .replace(/>/g,"&gt;")}</p>`)
+            .join('');
+
+            // Update conversation history display
+            updateConversationDisplay();
+
+            // Clear input for next interaction
+            document.getElementById('problemInput').value = '';
+
+            // Scroll to response
+            responseDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        } catch (error) {
+            console.error('Error generating response:', error);
+            responseText.innerHTML =
+            '<div class="error">' +
+            (error && error.message ? error.message : 'Unable to connect to coaching service.') +
+            '</div>';
+        } finally {
+            // Re-enable button
+            submitButton.disabled = false;
+            submitButton.textContent = 'Get Coaching Support';
+        }
+        }
+
+
+        function clearHistory() {
+            conversationHistory = [];
+            updateConversationDisplay();
+            document.getElementById('responseSection').classList.add('hidden');
+            document.getElementById('problemInput').value = '';
+        }
+
+        // Allow Enter key to generate response (Ctrl+Enter since it's a textarea)
+        document.getElementById('problemInput').addEventListener('keydown', function (e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                generateResponse();
+            }
+        });
+    </script>
+</body>
+</html>
