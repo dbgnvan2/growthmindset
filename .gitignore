@@ -4,3 +4,5 @@ node_modules
 .env.local
 .env.production
 .DS_Store
+complete_server_js.js
+server backup wo vercel.js
